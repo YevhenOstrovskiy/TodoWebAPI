@@ -1,0 +1,10 @@
+@WebAPI_HostAddress = http://localhost:5093
+
+GET {{WebAPI_HostAddress}}/todo/
+Accept: application/json
+
+###
+
+GET {{WebAPI_HostAddress}}/todo/{id}
+
+###
