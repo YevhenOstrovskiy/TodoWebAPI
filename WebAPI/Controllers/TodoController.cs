@@ -1,4 +1,5 @@
-﻿using DataAccess;
+﻿using Businesslogic;
+using DataAccess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +8,7 @@ namespace WebAPI
 
     [ApiController]
     [Route("[controller]")]
-    public class TodoController : ControllerBase
+    public class TodoController(ITodoService todoService) : ControllerBase
     {
         private readonly TodoDb _db;
         private readonly ILogger<TodoController> _logger;
@@ -96,7 +97,7 @@ namespace WebAPI
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetById([FromRoute]Guid id)
         {
             try
             {
@@ -152,7 +153,7 @@ namespace WebAPI
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddTodo([FromBody] string newTodoName)
+        public async Task<IActionResult> CreateTodo([FromBody] string newTodoName)
         {
             try
             {
@@ -161,19 +162,11 @@ namespace WebAPI
                     return BadRequest("Todo name is required.");
                 }
 
-                var newTodo = new Todo
-                {
-                    Id = Guid.NewGuid(),
-                    Name = newTodoName,
-                    IsComplete = false
-                };
+                _logger.LogInformation("Creating new Todo item with Name {Name}", newTodoName);
 
-                _logger.LogInformation("Creating Todo item with ID {Id}", newTodo.Id);
+                await todoService.CreateAsync(newTodoName);
 
-                _db.Todos.Add(newTodo);
-                await _db.SaveChangesAsync();
-
-                return CreatedAtAction(nameof(GetById), new { id = newTodo.Id }, newTodo);
+                return NoContent();
             }
             catch (Exception ex)
             {

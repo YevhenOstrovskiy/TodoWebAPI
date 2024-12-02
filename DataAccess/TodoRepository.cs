@@ -14,5 +14,10 @@ namespace DataAccess
             await context.Todos.AddAsync(todo, cancellationToken);
             await context.SaveChangesAsync();
         }
+
+        public async Task<Todo?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            return await context.Todos.FirstOrDefaultAsync(x => x.Id == id);
+        }
     }
 }

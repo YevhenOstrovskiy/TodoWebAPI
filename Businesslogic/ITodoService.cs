@@ -9,5 +9,7 @@ namespace Businesslogic
     public interface ITodoService
     {
         Task CreateAsync(string name, CancellationToken cancellationToken = default);
+
+        Task<string> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     }
 }

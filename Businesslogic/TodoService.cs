@@ -18,5 +18,11 @@ namespace Businesslogic
 
             await todoRepository.CreateAsync(todo, cancellationToken);
         }
+
+        public async Task<string> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            var todo = await todoRepository.GetByIdAsync(id, cancellationToken);
+            return todo.Name;
+        }
     }
 }
