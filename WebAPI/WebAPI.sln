@@ -5,9 +5,9 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI", "WebAPI.csproj", "{9CF1DCA4-F0CD-48F9-A708-F232FE5B9994}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "..\DataAccess\DataAccess.csproj", "{EA54561D-11DF-44B4-92E0-6B1371EAA6A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "..\DataAccess\DataAccess.csproj", "{EA54561D-11DF-44B4-92E0-6B1371EAA6A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Businesslogic", "..\Businesslogic\Businesslogic.csproj", "{422DCA60-B6FA-4783-A015-B8253FE4F108}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogic", "..\Businesslogic\BusinessLogic.csproj", "{422DCA60-B6FA-4783-A015-B8253FE4F108}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

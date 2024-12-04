@@ -8,15 +8,15 @@ namespace WebAPI
 
     [ApiController]
     [Route("[controller]")]
-    public class TodoController(ITodoService todoService) : ControllerBase
+    public class TodoController : ControllerBase
     {
-        private readonly TodoDb _db;
         private readonly ILogger<TodoController> _logger;
+        private readonly ITodoService _todoService;
 
-        public TodoController(TodoDb db, ILogger<TodoController> logger)
+        public TodoController(ITodoService todoService, ILogger<TodoController> logger)
         {
-            _db = db;
             _logger = logger;
+            _todoService = todoService;
         }
 
         private ActionResult HandleError(Exception ex, string errorMessage)
@@ -33,7 +33,7 @@ namespace WebAPI
             {
                 _logger.LogInformation("Fetching Todo items");
 
-                var todos = await _db.Todos.ToListAsync();
+                var todos = await _todoService.GetAllAsync();
                 if (todos == null || !todos.Any())
                 {
                     _logger.LogWarning("No Todo items found in the database.");
@@ -56,7 +56,7 @@ namespace WebAPI
             {
                 _logger.LogInformation("Fetching completed Todo items");
 
-                var completedTodos = await _db.Todos.Where(t => t.IsComplete).ToListAsync();
+                var completedTodos = await _todoService.GetCompletedAsync();
                 if (completedTodos == null || !completedTodos.Any())
                 {
                     _logger.LogInformation("No completed Todo items found.");
@@ -79,7 +79,7 @@ namespace WebAPI
             {
                 _logger.LogInformation("Fetching uncompleted Todo items");
 
-                var uncompletedTodos = await _db.Todos.Where(t => !t.IsComplete).ToListAsync();
+                var uncompletedTodos = await _todoService.GetUncompletedAsync();
 
                 if (uncompletedTodos == null || !uncompletedTodos.Any())
                 {
@@ -103,7 +103,7 @@ namespace WebAPI
             {
                 _logger.LogInformation("Fetching Todo item with ID {Id}", id);
 
-                var todo = await _db.Todos.FindAsync(id);
+                var todo = await _todoService.GetByIdAsync(id);
 
                 if (todo == null)
                 {
@@ -164,7 +164,7 @@ namespace WebAPI
 
                 _logger.LogInformation("Creating new Todo item with Name {Name}", newTodoName);
 
-                await todoService.CreateAsync(newTodoName);
+                await _todoService.CreateAsync(newTodoName);
 
                 return NoContent();
             }
