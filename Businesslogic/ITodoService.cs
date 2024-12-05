@@ -12,8 +12,11 @@ namespace Businesslogic
         Task<List<Todo>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<List<Todo>> GetCompletedAsync(CancellationToken cancellationToken = default);
         Task<List<Todo>> GetUncompletedAsync(CancellationToken cancellationToken = default);
-        Task<Todo> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<Todo?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<List<Todo>?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
         Task CreateAsync(string name, CancellationToken cancellationToken = default);
+        Task CreateBulkAsync(List<string> newTodoNames, CancellationToken cancellationToken = default);
+        Task ChangeByIdAsync(Guid id, Todo inputTodo, CancellationToken cancellationToken = default);
         
     }
 

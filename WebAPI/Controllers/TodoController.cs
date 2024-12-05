@@ -133,9 +133,7 @@ namespace WebAPI
 
                 _logger.LogInformation("Searching Todo items contains Name {Name}", query);
 
-                var todos = await _db.Todos
-                    .Where(t => t.Name != null && t.Name.ToLower().Contains(query.ToLower()))
-                    .ToListAsync();
+                var todos = await _todoService.GetByNameAsync(query);
 
                 if (todos == null || !todos.Any())
                 {
@@ -175,7 +173,7 @@ namespace WebAPI
         }
 
         [HttpPost("bulk")]
-        public async Task<IActionResult> AddTodos([FromBody] IEnumerable<string> newTodoNames)
+        public async Task<IActionResult> AddTodos([FromBody] List<string> newTodoNames)
         {
             try
             {
@@ -185,19 +183,10 @@ namespace WebAPI
                     return BadRequest("The list of new todo names cannot be null or empty.");
                 }
 
-                var todos = newTodoNames.Select(name => new Todo
-                {
-                    Id = Guid.NewGuid(),
-                    Name = name,
-                    IsComplete = false
-                });
+                await _todoService.CreateBulkAsync(newTodoNames);
+                _logger.LogInformation("Adding {Count} Todo items in bulk.", newTodoNames.Count);
 
-                _logger.LogInformation("Adding {Count} Todo items in bulk.", todos.Count());
-
-                _db.Todos.AddRange(todos);
-                await _db.SaveChangesAsync();
-
-                return CreatedAtAction(nameof(Get), null, todos);
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -210,7 +199,7 @@ namespace WebAPI
         {
             try
             {
-                var todo = await _db.Todos.FindAsync(id);
+                var todo = await _todoService.GetByIdAsync(id);
 
                 if (todo == null)
                 {
@@ -218,10 +207,7 @@ namespace WebAPI
                     return NotFound($"Todo with ID {id} not found.");
                 }
 
-                todo.Name = inputTodo.Name;
-                todo.IsComplete = inputTodo.IsComplete;
-
-                await _db.SaveChangesAsync();
+                await _todoService.ChangeByIdAsync(id, inputTodo);
 
                 return NoContent();
             }

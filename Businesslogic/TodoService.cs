@@ -24,10 +24,14 @@ namespace Businesslogic
             return await todoRepository.GetUncompletedAsync(cancellationToken);
         }
 
-        public async Task<Todo> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<Todo?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var todo = await todoRepository.GetByIdAsync(id, cancellationToken);
-            return todo;
+            return await todoRepository.GetByIdAsync(id, cancellationToken);
+        }
+
+        public async Task<List<Todo>?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+        {
+            return await todoRepository.GetByNameAsync(name, cancellationToken);
         }
 
         public async Task CreateAsync(string name, CancellationToken cancellationToken = default)
@@ -38,6 +42,21 @@ namespace Businesslogic
             };
 
             await todoRepository.CreateAsync(todo, cancellationToken);
+        }
+
+        public async Task CreateBulkAsync(List<string> newTodoNames, CancellationToken cancellationToken = default)
+        {
+            var todos = newTodoNames.Select(name => new Todo
+            {
+                Name = name,
+            }).ToList();
+
+            await todoRepository.CreateBulkAsync(todos, cancellationToken);
+        }
+
+        public async Task ChangeByIdAsync(Guid id, Todo inputTodo, CancellationToken cancellationToken = default)
+        {
+            await todoRepository.ChangeByIdAsync(id, inputTodo, cancellationToken);
         }
     }
 }
