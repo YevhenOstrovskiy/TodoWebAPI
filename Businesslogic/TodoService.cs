@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccess;
+﻿using DataAccess;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Businesslogic
 {
@@ -54,9 +50,39 @@ namespace Businesslogic
             await todoRepository.CreateBulkAsync(todos, cancellationToken);
         }
 
-        public async Task ChangeByIdAsync(Guid id, Todo inputTodo, CancellationToken cancellationToken = default)
+        public async Task UpdateByIdAsync(Guid id, Todo inputTodo, CancellationToken cancellationToken = default)
         {
-            await todoRepository.ChangeByIdAsync(id, inputTodo, cancellationToken);
+            var todo = await todoRepository.GetByIdAsync(id, cancellationToken);
+            if (todo is null)
+            {
+                throw new ArgumentNullException($"Todo with {id} wasn`t found");
+            }
+
+            todo.Name = inputTodo.Name;
+            todo.IsComplete = inputTodo.IsComplete;
+
+            await todoRepository.UpdateByIdAsync(inputTodo, cancellationToken);
+        }
+
+        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            var todo = await todoRepository.GetByIdAsync(id, cancellationToken);
+            if (todo is null)
+            {
+                throw new ArgumentNullException($"Todo with {id} wasn`t found");
+            }
+
+            await todoRepository.DeleteAsync(todo, cancellationToken);
+        }
+
+        public async Task DeleteBulkAsync(List<Todo> todos, CancellationToken cancellationToken = default)
+        {
+            if (todos.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException($"Todo list is null or empty.Value of todos: {todos}");
+            }
+
+            await todoRepository.DeleteBulkAsync(todos, cancellationToken);
         }
     }
 }

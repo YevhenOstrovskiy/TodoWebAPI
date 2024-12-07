@@ -1,7 +1,6 @@
 ﻿using Businesslogic;
 using DataAccess;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI
 {
@@ -57,7 +56,7 @@ namespace WebAPI
                 _logger.LogInformation("Fetching completed Todo items");
 
                 var completedTodos = await _todoService.GetCompletedAsync();
-                if (completedTodos == null || !completedTodos.Any())
+                if (completedTodos is null || !completedTodos.Any())
                 {
                     _logger.LogInformation("No completed Todo items found.");
                     return NoContent();
@@ -81,7 +80,7 @@ namespace WebAPI
 
                 var uncompletedTodos = await _todoService.GetUncompletedAsync();
 
-                if (uncompletedTodos == null || !uncompletedTodos.Any())
+                if (uncompletedTodos is null || !uncompletedTodos.Any())
                 {
                     _logger.LogInformation("No uncompleted Todo items found.");
                     return NoContent();
@@ -105,7 +104,7 @@ namespace WebAPI
 
                 var todo = await _todoService.GetByIdAsync(id);
 
-                if (todo == null)
+                if (todo is null)
                 {
                     _logger.LogWarning("Todo with ID {Id} not found.", id);
                     return NotFound($"Todo with ID {id} was not found.");
@@ -135,7 +134,7 @@ namespace WebAPI
 
                 var todos = await _todoService.GetByNameAsync(query);
 
-                if (todos == null || !todos.Any())
+                if (todos is null || !todos.Any())
                 {
                     _logger.LogInformation("No Todo items contains Name {Name} found.", query);
                     return NoContent();
@@ -177,7 +176,7 @@ namespace WebAPI
         {
             try
             {
-                if (newTodoNames == null || !newTodoNames.Any())
+                if (newTodoNames is null || !newTodoNames.Any())
                 {
                     _logger.LogWarning("Attempted to add an empty or null list of todos.");
                     return BadRequest("The list of new todo names cannot be null or empty.");
@@ -201,13 +200,13 @@ namespace WebAPI
             {
                 var todo = await _todoService.GetByIdAsync(id);
 
-                if (todo == null)
+                if (todo is null)
                 {
                     _logger.LogWarning("Todo item with ID {Id} not found", id);
                     return NotFound($"Todo with ID {id} not found.");
                 }
 
-                await _todoService.ChangeByIdAsync(id, inputTodo);
+                await _todoService.UpdateByIdAsync(id, inputTodo);
 
                 return NoContent();
             }
@@ -222,17 +221,15 @@ namespace WebAPI
         {
             try
             {
-                var todo = await _db.Todos.FindAsync(id);
+                var todo = await _todoService.GetByIdAsync(id);
 
-                if (todo == null)
+                if (todo is null)
                 {
                     _logger.LogWarning("Todo item with ID {Id} not found", id);
                     return NotFound($"Todo with ID {id} not found.");
                 }
 
-                _db.Todos.Remove(todo);
-                await _db.SaveChangesAsync();
-
+                await _todoService.DeleteAsync(id);
                 return NoContent();
             }
             catch (Exception ex)
@@ -242,18 +239,19 @@ namespace WebAPI
         }
 
         [HttpDelete("bulk")]
-        public async Task<IActionResult> DeleteTodos([FromBody] IEnumerable<Todo> todos)
+        public async Task<IActionResult> DeleteTodos([FromBody] IEnumerable<Todo> todosToDelete)
         {
             try
             {
-                if (todos == null || !todos.Any())
+                if (todosToDelete is null || !todosToDelete.Any())
                 {
                     _logger.LogWarning("Attempted to delete an empty or null list of todos.");
                     return BadRequest("The list of todos to delete cannot be null or empty.");
                 }
 
-                var ids = todos.Select(t => t.Id).ToList();
-                var existingTodos = await _db.Todos.Where(t => ids.Contains(t.Id)).ToListAsync();
+                var ids = todosToDelete.Select(t => t.Id).ToList();
+                var todos = await _todoService.GetAllAsync();
+                var existingTodos = todos.Where(t => ids.Contains(t.Id)).ToList();
 
                 if (!existingTodos.Any())
                 {
@@ -261,9 +259,7 @@ namespace WebAPI
                     return NotFound("No matching Todo items found in the database.");
                 }
 
-                _db.Todos.RemoveRange(existingTodos);
-                await _db.SaveChangesAsync();
-
+                await _todoService.DeleteBulkAsync(existingTodos);
                 return NoContent();
             }
             catch (Exception ex)

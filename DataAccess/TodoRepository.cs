@@ -1,10 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DataAccess
 {
@@ -50,25 +44,23 @@ namespace DataAccess
             await context.SaveChangesAsync();
         }
 
-        public async Task ChangeByIdAsync(Guid id, Todo inputTodo, CancellationToken cancellationToken = default)
+        public async Task UpdateByIdAsync(Todo todo, CancellationToken cancellationToken = default)
         {
-            if (inputTodo == null)
-            {
-                throw new ArgumentNullException(nameof(inputTodo), "Input Todo cannot be null.");
-            }
-
-            var todo = await context.Todos.FindAsync(new object[] { id }, cancellationToken);
-            
-            if (todo == null)
-            {
-              throw new ArgumentNullException($"Todo with {id} wasn`t found");
-            }
-
-            todo.Name = inputTodo.Name;
-            todo.IsComplete = inputTodo.IsComplete;
-
+            context.Todos.Update(todo);
             await context.SaveChangesAsync(cancellationToken);
 
+        }
+
+        public async Task DeleteAsync(Todo todo, CancellationToken cancellationToken = default)
+        {
+            context.Todos.Remove(todo);
+            await context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task DeleteBulkAsync(List<Todo> todos, CancellationToken cancellationToken = default)
+        {
+            context.Todos.RemoveRange(todos);
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 }

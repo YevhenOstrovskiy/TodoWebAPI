@@ -1,10 +1,6 @@
 ﻿using DataAccess;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Businesslogic
 {
     public interface ITodoService
@@ -16,7 +12,9 @@ namespace Businesslogic
         Task<List<Todo>?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
         Task CreateAsync(string name, CancellationToken cancellationToken = default);
         Task CreateBulkAsync(List<string> newTodoNames, CancellationToken cancellationToken = default);
-        Task ChangeByIdAsync(Guid id, Todo inputTodo, CancellationToken cancellationToken = default);
+        Task UpdateByIdAsync(Guid id, Todo inputTodo, CancellationToken cancellationToken = default);
+        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+        Task DeleteBulkAsync(List<Todo> todos, CancellationToken cancellationToken = default);
         
     }
 
