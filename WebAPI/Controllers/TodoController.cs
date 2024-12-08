@@ -24,6 +24,23 @@ namespace WebAPI
             return StatusCode(StatusCodes.Status500InternalServerError, errorMessage);
         }
 
+        [HttpHead]
+        public IActionResult CheckAvailability()
+        {
+            _logger.LogInformation("HEAD request received for checking availability.");
+            return Ok();
+        }
+
+        [HttpOptions]
+        public IActionResult GetOptions()
+        {
+            _logger.LogInformation("OPTIONS request received.");
+
+            Response.Headers.Append("Allow", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+
+            return Ok();
+        }
+
         [HttpGet]
         [HttpGet("todoitems")]
         public async Task<ActionResult<IEnumerable<Todo>>> Get()
@@ -193,7 +210,7 @@ namespace WebAPI
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> ChangeTodo(Guid id, [FromBody] Todo inputTodo)
         {
             try
