@@ -180,7 +180,7 @@ namespace WebAPI
 
                 await _todoService.CreateAsync(newTodoName);
 
-                return NoContent();
+                return Created();
             }
             catch (Exception ex)
             {
@@ -202,7 +202,7 @@ namespace WebAPI
                 await _todoService.CreateBulkAsync(newTodoNames);
                 _logger.LogInformation("Adding {Count} Todo items in bulk.", newTodoNames.Count);
 
-                return NoContent();
+                return Created();
             }
             catch (Exception ex)
             {
