@@ -36,7 +36,7 @@ namespace WebAPI
         {
             _logger.LogInformation("OPTIONS request received.");
 
-            Response.Headers.Append("Allow", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+            Response.Headers.Append("Allow", "GET, POST, PATCH, DELETE, OPTIONS, HEAD");
 
             return Ok();
         }
