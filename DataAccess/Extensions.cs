@@ -12,7 +12,9 @@ namespace DataAccess
             serviceCollection.AddScoped<ITodoRepository, TodoRepository>();
             serviceCollection.AddDbContext<TodoDb>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                    b => b.MigrationsAssembly("DataAccess")
+                );
             });
 
             return serviceCollection;

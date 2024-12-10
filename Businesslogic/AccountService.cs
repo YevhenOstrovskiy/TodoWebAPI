@@ -21,22 +21,30 @@ namespace BusinessLogic
             var passwordHash = new PasswordHasher<Account>().HashPassword(account, password);
             account.PasswordHash = passwordHash;
 
-            accountRepository.Add(account);
+            accountRepository.AddAsync(account);
         }
         public string Login(string email, string password)
         {
-            var account = accountRepository.GetByEmail(email);
-            var result = new PasswordHasher<Account>()
-                .VerifyHashedPassword(
-                    account, account.PasswordHash, password
-                );
-            if (result == PasswordVerificationResult.Success)
+            var account = accountRepository.GetByEmailAsync(email);
+
+            if (account is null)
             {
-                return jwtService.GenerateToken(account);
+                throw new Exception("Account wasn`t found");
             }
             else 
             {
-                throw new Exception("Unauthorized");
+                var result = new PasswordHasher<Account>()
+                .VerifyHashedPassword(
+                    account, account.PasswordHash, password
+                );
+                if (result == PasswordVerificationResult.Success)
+                {
+                    return jwtService.GenerateToken(account);
+                }
+                else
+                {
+                    throw new Exception("Unauthorized");
+                }
             }
 
         }

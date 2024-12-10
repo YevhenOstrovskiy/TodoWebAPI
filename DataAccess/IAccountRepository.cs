@@ -8,7 +8,7 @@ namespace DataAccess
 {
     public interface IAccountRepository
     {
-        void Add(Account account);
-        Account GetByEmail(string email);
+        Task AddAsync(Account account, CancellationToken cancellationToken = default);
+        Account GetByEmailAsync(string email, CancellationToken cancellationToken = default);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    internal class AccountRepository : IAccountRepository
+    internal class AccountRepository(TodoDb context) : IAccountRepository
     {
-        private static IDictionary<string, Account> accounts = new Dictionary<string, Account>();
 
-        public void Add(Account account)
+        public async Task AddAsync(Account account, CancellationToken cancellationToken = default)
         {
-            accounts[account.Email] = account;
+            await context.Accounts.AddAsync(account, cancellationToken);
+            await context.SaveChangesAsync();
         }
 
-        public Account? GetByEmail(string email)
+        public Account GetByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            return accounts.TryGetValue(email, out var account) ? account : null;  
+            return context.Accounts.FirstOrDefault(a => a.Email == email);
         }
     }
 }
