@@ -1,5 +1,6 @@
 ﻿using Businesslogic;
 using DataAccess;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI
@@ -7,6 +8,7 @@ namespace WebAPI
 
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class TodoController : ControllerBase
     {
         private readonly ILogger<TodoController> _logger;

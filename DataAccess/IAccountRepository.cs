@@ -9,6 +9,6 @@ namespace DataAccess
     public interface IAccountRepository
     {
         void Add(Account account);
-        Account GetByUsername(string userName);
+        Account GetByEmail(string email);
     }
 }

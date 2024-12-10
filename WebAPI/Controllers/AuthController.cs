@@ -12,32 +12,24 @@ namespace WebAPI.Controllers
     {
         private readonly IAccountService _accountService;
 
+        public AuthController(IAccountService accountService)
+        {
+            _accountService = accountService;
+        }
+
         [HttpPost("register")]
         public IActionResult Register([FromBody]RegisterUserRequest request)
         {
-            try
-            {
                 _accountService.Register(request.UserName, request.Email, request.Password);
                 return NoContent();
-            }
-            catch
-            {
-                return View();
-            }
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest loginRequest)
         {
-            try
-            {
-                _accountService.Login(loginRequest.Email, loginRequest.Password);
-                return Ok();
-            }
-            catch
-            {
-                return View();
-            }
+
+                var token = _accountService.Login(loginRequest.Email, loginRequest.Password);
+                return Ok(token);
         }
 
     }

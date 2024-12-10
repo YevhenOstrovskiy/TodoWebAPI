@@ -9,6 +9,6 @@ namespace BusinessLogic
     public interface IAccountService
     {
         void Register(string userName, string email, string password);
-        void Login(string email, string passwordHash);
+        string Login(string email, string passwordHash);
     }
 }

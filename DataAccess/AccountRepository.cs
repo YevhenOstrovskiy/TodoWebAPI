@@ -12,12 +12,12 @@ namespace DataAccess
 
         public void Add(Account account)
         {
-            accounts[account.UserName] = account;
+            accounts[account.Email] = account;
         }
 
-        public Account? GetByUsername(string userName)
+        public Account? GetByEmail(string email)
         {
-            return accounts.TryGetValue(userName, out var account) ? account : null;    
+            return accounts.TryGetValue(email, out var account) ? account : null;  
         }
     }
 }

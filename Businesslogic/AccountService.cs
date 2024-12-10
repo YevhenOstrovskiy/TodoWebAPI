@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLogic
 {
-    internal class AccountService(IAccountRepository accountRepository) : IAccountService
+    internal class AccountService(IAccountRepository accountRepository, JwtService jwtService) : IAccountService
     {
         public void Register(string userName, string email, string password)
         {
@@ -23,16 +23,16 @@ namespace BusinessLogic
 
             accountRepository.Add(account);
         }
-        public void Login(string email, string password)
+        public string Login(string email, string password)
         {
-            var account = accountRepository.GetByUsername(email);
+            var account = accountRepository.GetByEmail(email);
             var result = new PasswordHasher<Account>()
                 .VerifyHashedPassword(
                     account, account.PasswordHash, password
                 );
             if (result == PasswordVerificationResult.Success)
             {
-                //generate token
+                return jwtService.GenerateToken(account);
             }
             else 
             {

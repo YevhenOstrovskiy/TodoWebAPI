@@ -8,6 +8,7 @@ namespace DataAccess
     {
         public static IServiceCollection AddData(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
+            serviceCollection.AddScoped<IAccountRepository, AccountRepository>();
             serviceCollection.AddScoped<ITodoRepository, TodoRepository>();
             serviceCollection.AddDbContext<TodoDb>(options =>
             {
