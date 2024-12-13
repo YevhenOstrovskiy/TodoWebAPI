@@ -1,14 +1,24 @@
-﻿using DataAccess;
+﻿using BusinessLogic;
+using DataAccess;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
 namespace Businesslogic
 {
-    internal class TodoService(ITodoRepository todoRepository) : ITodoService
+    internal class TodoService : ITodoService
     {
+        private readonly ITodoRepository todoRepository;
+        private readonly Guid? userId;
+
+        public TodoService(ITodoRepository todoRepository, IAccountService accountService)
+        {
+            this.todoRepository = todoRepository;
+            userId = accountService.GetAccountId();
+        }
         public async Task<List<Todo>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await todoRepository.GetAllAsync(cancellationToken);
+            var getAll = await todoRepository.GetAllAsync(cancellationToken);
+            return getAll.Where(g => g.AccountId == userId).ToList();
         }
 
         public async Task<List<Todo>> GetCompletedAsync(CancellationToken cancellationToken = default)
@@ -33,12 +43,18 @@ namespace Businesslogic
 
         public async Task CreateAsync(string name, CancellationToken cancellationToken = default)
         {
-            var todo = new Todo
+            if (userId is not null)
             {
-                Name = name,
-            };
+                var todo = new Todo
+                {
+                    Name = name,
+                    AccountId = (Guid)userId,
 
-            await todoRepository.CreateAsync(todo, cancellationToken);
+                };
+
+                await todoRepository.CreateAsync(todo, cancellationToken);
+            }
+
         }
 
         public async Task CreateBulkAsync(List<string> newTodoNames, CancellationToken cancellationToken = default)
