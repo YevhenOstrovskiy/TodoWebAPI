@@ -6,12 +6,9 @@ namespace Businesslogic
 {
     public static class Extensions
     {
-        public static IServiceCollection AddBusinessLogic(this IServiceCollection serviceCollection, IConfiguration configuration)
+        public static IServiceCollection AddBusinessLogic(this IServiceCollection serviceCollection)
         {
-            serviceCollection.Configure<AuthSettings>(configuration.GetSection("AuthSettings"));
             serviceCollection.AddScoped<ITodoService, TodoService>();
-            serviceCollection.AddScoped<IAccountService, AccountService>();
-            serviceCollection.AddScoped<JwtService>();
             return serviceCollection;
         }
     }

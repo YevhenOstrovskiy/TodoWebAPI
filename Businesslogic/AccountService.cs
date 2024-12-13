@@ -1,16 +1,19 @@
 ﻿using DataAccess;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BusinessLogic
 {
-    internal class AccountService(IAccountRepository accountRepository, JwtService jwtService) : IAccountService
+    internal class AccountService(IAccountRepository accountRepository, JwtService jwtService, IHttpContextAccessor httpContextAccessor) : IAccountService
     {
-        public void Register(string userName, string email, string password)
+
+        public async Task Register(string userName, string email, string password)
         {
             var account = new Account
             {
@@ -21,11 +24,11 @@ namespace BusinessLogic
             var passwordHash = new PasswordHasher<Account>().HashPassword(account, password);
             account.PasswordHash = passwordHash;
 
-            accountRepository.AddAsync(account);
+            await accountRepository.AddAsync(account);
         }
-        public string Login(string email, string password)
+        public async Task<string> Login(string email, string password)
         {
-            var account = accountRepository.GetByEmailAsync(email);
+            var account = await accountRepository.GetByEmailAsync(email);
 
             if (account is null)
             {
@@ -49,5 +52,16 @@ namespace BusinessLogic
 
         }
 
+        public Guid? GetAccountId()
+        {
+            var user = httpContextAccessor.HttpContext?.User;
+            if (user is null || !user.Identity.IsAuthenticated)
+            {
+                return null;
+            }
+
+            var accountIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+            return accountIdClaim != null ? Guid.Parse(accountIdClaim.Value) : null;
+        }
     }
 }

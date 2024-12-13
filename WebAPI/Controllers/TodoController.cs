@@ -2,6 +2,7 @@
 using DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace WebAPI
 {
@@ -39,7 +40,6 @@ namespace WebAPI
             _logger.LogInformation("OPTIONS request received.");
 
             Response.Headers.Append("Allow", "GET, POST, PATCH, DELETE, OPTIONS, HEAD");
-
             return Ok();
         }
 

@@ -18,9 +18,9 @@ namespace BusinessLogic
         {
             var claims = new List<Claim>
             {
-                new Claim("userName", account.UserName),
-                new Claim("email", account.Email),
-                new Claim("id", account.Id.ToString())
+                new Claim(ClaimTypes.Name, account.UserName),
+                new Claim(ClaimTypes.Email, account.Email),
+                new Claim(ClaimTypes.NameIdentifier, account.Id.ToString())
             };
 
             var jwtToken = new JwtSecurityToken(

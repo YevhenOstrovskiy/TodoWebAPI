@@ -16,9 +16,9 @@ namespace DataAccess
             await context.SaveChangesAsync();
         }
 
-        public Account GetByEmailAsync(string email, CancellationToken cancellationToken = default)
+        public async Task<Account> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            return context.Accounts.FirstOrDefault(a => a.Email == email);
+            return await context.Accounts.FirstOrDefaultAsync(a => a.Email == email);
         }
     }
 }

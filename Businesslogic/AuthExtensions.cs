@@ -14,6 +14,9 @@ namespace BusinessLogic
     {
         public static IServiceCollection AddAuth(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
+            serviceCollection.Configure<AuthSettings>(configuration.GetSection("AuthSettings"));
+            serviceCollection.AddScoped<IAccountService, AccountService>();
+            serviceCollection.AddScoped<JwtService>();
             var authSettings = configuration.GetSection(nameof(AuthSettings))
                 .Get<AuthSettings>();
             serviceCollection.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

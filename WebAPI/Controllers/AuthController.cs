@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
 {
-        [ApiController]
+    [ApiController]
     [Route("[controller]")]
     public class AuthController : Controller
     {
@@ -18,17 +18,17 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody]RegisterUserRequest request)
+        public async Task<IActionResult> Register([FromBody]RegisterUserRequest request)
         {
-                _accountService.Register(request.UserName, request.Email, request.Password);
+                await _accountService.Register(request.UserName, request.Email, request.Password);
                 return NoContent();
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest loginRequest)
+        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
 
-                var token = _accountService.Login(loginRequest.Email, loginRequest.Password);
+                var token = await _accountService.Login(loginRequest.Email, loginRequest.Password);
                 return Ok(token);
         }
 

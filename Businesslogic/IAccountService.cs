@@ -8,7 +8,8 @@ namespace BusinessLogic
 {
     public interface IAccountService
     {
-        void Register(string userName, string email, string password);
-        string Login(string email, string passwordHash);
+        Task Register(string userName, string email, string password);
+        Task<string> Login(string email, string passwordHash);
+        Guid? GetAccountId();
     }
 }
