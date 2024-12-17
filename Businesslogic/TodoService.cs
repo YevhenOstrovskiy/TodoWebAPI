@@ -1,5 +1,6 @@
 ﻿using BusinessLogic;
 using DataAccess;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
@@ -8,47 +9,46 @@ namespace Businesslogic
     internal class TodoService : ITodoService
     {
         private readonly ITodoRepository todoRepository;
-        private readonly Guid? userId;
+        private readonly Guid? accountId;
 
         public TodoService(ITodoRepository todoRepository, IAccountService accountService)
         {
             this.todoRepository = todoRepository;
-            userId = accountService.GetAccountId();
+            accountId = accountService.GetAccountId();
         }
         public async Task<List<Todo>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var getAll = await todoRepository.GetAllAsync(cancellationToken);
-            return getAll.Where(g => g.AccountId == userId).ToList();
+            return await todoRepository.GetAllAsync(accountId);
         }
 
         public async Task<List<Todo>> GetCompletedAsync(CancellationToken cancellationToken = default)
         {
-            return await todoRepository.GetCompletedAsync(cancellationToken);
+            return await todoRepository.GetCompletedAsync(accountId, cancellationToken);
         }
 
         public async Task<List<Todo>> GetUncompletedAsync(CancellationToken cancellationToken = default)
         {
-            return await todoRepository.GetUncompletedAsync(cancellationToken);
+            return await todoRepository.GetUncompletedAsync(accountId, cancellationToken);
         }
 
         public async Task<Todo?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return await todoRepository.GetByIdAsync(id, cancellationToken);
+            return await todoRepository.GetByIdAsync(accountId, id, cancellationToken);
         }
 
         public async Task<List<Todo>?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
         {
-            return await todoRepository.GetByNameAsync(name, cancellationToken);
+            return await todoRepository.GetByNameAsync(accountId, name, cancellationToken);
         }
 
         public async Task CreateAsync(string name, CancellationToken cancellationToken = default)
         {
-            if (userId is not null)
+            if (accountId is not null)
             {
                 var todo = new Todo
                 {
                     Name = name,
-                    AccountId = (Guid)userId,
+                    AccountId = (Guid)accountId,
 
                 };
 
@@ -62,6 +62,7 @@ namespace Businesslogic
             var todos = newTodoNames.Select(name => new Todo
             {
                 Name = name,
+                AccountId= (Guid)accountId,
             }).ToList();
 
             await todoRepository.CreateBulkAsync(todos, cancellationToken);
@@ -69,7 +70,7 @@ namespace Businesslogic
 
         public async Task UpdateByIdAsync(Guid id, Todo inputTodo, CancellationToken cancellationToken = default)
         {
-            var todo = await todoRepository.GetByIdAsync(id, cancellationToken);
+            var todo = await todoRepository.GetByIdAsync(accountId, id, cancellationToken);
             if (todo is null)
             {
                 throw new ArgumentNullException($"Todo with {id} wasn`t found");
@@ -78,18 +79,18 @@ namespace Businesslogic
             todo.Name = inputTodo.Name;
             todo.IsComplete = inputTodo.IsComplete;
 
-            await todoRepository.UpdateByIdAsync(inputTodo, cancellationToken);
+            await todoRepository.UpdateByIdAsync(accountId, inputTodo, cancellationToken);
         }
 
         public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var todo = await todoRepository.GetByIdAsync(id, cancellationToken);
+            var todo = await todoRepository.GetByIdAsync(accountId, id, cancellationToken);
             if (todo is null)
             {
                 throw new ArgumentNullException($"Todo with {id} wasn`t found");
             }
 
-            await todoRepository.DeleteAsync(todo, cancellationToken);
+            await todoRepository.DeleteAsync(accountId, todo, cancellationToken);
         }
 
         public async Task DeleteBulkAsync(List<Todo> todos, CancellationToken cancellationToken = default)
@@ -99,7 +100,7 @@ namespace Businesslogic
                 throw new ArgumentNullException($"Todo list is null or empty.Value of todos: {todos}");
             }
 
-            await todoRepository.DeleteBulkAsync(todos, cancellationToken);
+            await todoRepository.DeleteBulkAsync(accountId, todos, cancellationToken);
         }
     }
 }

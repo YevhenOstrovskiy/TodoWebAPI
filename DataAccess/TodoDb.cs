@@ -18,7 +18,7 @@ namespace DataAccess
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Todo>()
-                .HasOne(todo => todo.Account)
+                .HasOne<Account>()
                 .WithMany(account => account.Todos)
                 .HasForeignKey(todo => todo.AccountId)
                 .OnDelete(DeleteBehavior.Cascade);
